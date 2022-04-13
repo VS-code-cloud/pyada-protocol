@@ -87,7 +87,7 @@ async function getNFTs(address) {
           .then(response => response.json())
           .then(data => {
             $("#content").html($("#content").html() 
-              + "<div><img width='100' align='left' src='" + ((data.image).startsWith("https:") || (data.image).startsWith("http:")) ? data.image :   + "' />"
+              + "<div><img width='100' align='left' src='" + ((data.image).startsWith("https:") || (data.image).startsWith("http:")) ? data.image : "https://upload.wikimedia.org/wikipedia/commons/3/3f/Placeholder_view_vector.svg"  + "' />"
               + "<h2>" + data.name + "</h2>"
               + "<p>" + data.description + "</p></div><br clear='all' />");
           });
