@@ -1,0 +1,26 @@
+{
+  "name": "MyPastProjects",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "body-parser": "^1.19.0",
+    "desandro-matches-selector": "^2.0.2",
+    "ejs": "^3.1.6",
+    "ev-emitter": "^2.1.2",
+    "express": "^4.17.1",
+    "fizzy-ui-utils": "^3.0.0",
+    "get-size": "^3.0.0",
+    "isotope-layout": "^3.0.6",
+    "jquery": "^3.6.0",
+    "masonry-layout": "^4.2.2",
+    "outlayer": "^2.1.1",
+    "sqlite3": "^5.0.2"
+  }
+}
