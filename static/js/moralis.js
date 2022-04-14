@@ -183,7 +183,9 @@ async function pawnNFT(address, loanAmount, loanDuration, tokenid, imageURI, sym
       await user.save()
 
       console.log("after curr pawned", user.get("pawnedNFTs"))
-    
+
+window.location.reload();
+      
     } catch(err) {
       console.log("There was an error", err)
     }
