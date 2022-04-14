@@ -239,6 +239,7 @@ body {
   display: inline-block !important;
   padding: 10px 20px !important;
   color: #fff !important;
+  vertical-align: middle;
   text-transform: capitalize;
   font-size: 15px;
   background: rgb(19,175,240);
@@ -275,7 +276,60 @@ body {
   color: #fff !important;
 }
 
-
+.pawn-modal {
+  display: none; /* Hidden by default */
+  position: fixed; /* Stay in place */
+  z-index: 1; /* Sit on top */
+  left: 0;
+  top: 0;
+  width: 100%; /* Full width */
+  height: 100%; /* Full height */
+  overflow: auto; /* Enable scroll if needed */
+  background-color: rgb(0,0,0); /* Fallback color */
+  background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+}
+.pawn-complete {
+  display: none; /* Hidden by default */
+  position: fixed; /* Stay in place */
+  z-index: 1; /* Sit on top */
+  left: 0;
+  top: 0;
+  width: 100%; /* Full width */
+  height: 100%; /* Full height */
+  overflow: auto; /* Enable scroll if needed */
+  background-color: rgb(0,0,0); /* Fallback color */
+  background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+}
+.pawn-modal-content {
+  border-radius: 5%;
+  background-color: #fefefe;
+  margin: 15% auto;
+  padding-left: 10px;
+  padding-right: 10px;
+  padding-top: 5%;
+  padding-bottom: 5%;
+  border: 1px solid #888;
+  width: 30%;
+  min-width: 300px;
+}
+.close-pawn-modal {
+  color: #aaa;
+  float: right;
+  padding: 0px;
+  font-size: 28px;
+  font-weight: bold;
+  padding-top: 0px;
+}
+.close-pawn-modal:hover,
+.close-pawn-modal:focus {
+  color: black;
+  text-decoration: none;
+  cursor: pointer;
+}
+.invisBtn {
+  background-color: white;
+  border: none;
+}
 /* 
 ---------------------------------------------
 header
@@ -1333,6 +1387,7 @@ The Clients
   box-shadow: 0px 0px 15px rgba(0,0,0,0.07);
   border-radius: 50px;
   padding: 90px 30px;
+  background-color: #080C24;
   text-align: center;
   position: relative;
   z-index: 1;
@@ -1344,7 +1399,7 @@ The Clients
   top: 0;
   left: 0;
   background-image: url(../images/regular-table-top.png);
-  z-index: 0;
+  z-index: -10;
   content: '';
   width: 274px;
   height: 221px;
@@ -1375,6 +1430,7 @@ The Clients
   font-size: 20px;
   font-weight: 700;
   margin-bottom: 30px;
+  color: white;
 }
 
 .pricing-item-regular .icon img {
@@ -1410,6 +1466,7 @@ The Clients
   padding: 120px 30px;
   text-align: center;
   position: relative;
+  background-color: #080C24;
   z-index: 1;
   overflow: hidden;
 }
@@ -1418,11 +1475,16 @@ The Clients
   position: absolute;
   top: 0;
   left: 0;
-  background-image: url(../images/pro-table-top.png);
-  z-index: 0;
+  background: url(../images/pro-table-top.png); no-repeat center center fixed; 
+  -webkit-background-size: cover;
+  -moz-background-size: cover;
+  -o-background-size: cover;
+  background-size: cover;
+  z-index: -10;
   content: '';
   width: 281px;
   height: 251px;
+  max-width: 100%;
 }
 
 .pricing-item-pro:after {
@@ -1452,6 +1514,7 @@ The Clients
   font-size: 20px;
   font-weight: 700;
   margin-bottom: 30px;
+  color: white;
 }
 
 .pricing-item-pro .icon img {

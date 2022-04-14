@@ -3,6 +3,8 @@ var app = express();
 var bodyParser = require('body-parser'); 
 var ejs = require("ejs");
 
+var { quotePrice } = require("./backend/quote-price-matic.js")
+
 app.set('view engine', 'html');
 app.engine('html', ejs.renderFile);
 app.use('/static', express.static('static'))
@@ -15,6 +17,19 @@ app.get('/', (req, res) => {
 
 app.get('/dashboard', (req, res) => {
   res.render("dashboard.html", {})
+})
+
+app.get('/api/getQuotePrice', async (req, res) => {
+  address = req.query.address;
+  token = req.query.token;
+  console.log('addr, token:', address, ', ', token)
+  try {
+    value = await quotePrice(address, token);
+    console.log('got quote',value)
+    res.send({'quote': value})
+  } catch (error) {
+    console.log("Error",error)
+  }
 })
 
 

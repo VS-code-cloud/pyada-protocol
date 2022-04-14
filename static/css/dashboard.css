@@ -3,7 +3,69 @@
 }
 
 .bodyContainer {
+  position: relative;
   margin-left: 4vw;
   margin-right: 5vw;
-  margin-top: 4vw;
+  margin-top: calc(70px + 5vw);
+}
+
+.nftImg {
+  width: 250px;
+  max-width: 66.67vw;
+  margin: 8.5%;
+  border-radius: 5%;
+}
+
+.nftsWrapper {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.nftDisplayBox {
+  margin-right: 1vw;
+  margin-bottom: 3vh;
+  background-color: #080C24;
+  border-radius: 5%;
+  width: 300px;
+  max-width: 80vw;
+}
+
+.nftDisplayBox button {
+  text-align: center;
+  width: 250px;
+  font-size: 10px;
+  max-width: 66.67vw;
+  margin-left: 8.5%;
+  margin-right: 8.5%;
+  margin-top: 4.5%;
+  margin-bottom: 4.5%;
+  padding-top: 10px;
+  padding-bottom: 10px;
+  background-color: #1A1C4E;
+  color: white;
+  letter-spacing: 2.5px;
+  border-radius: 5px;
+  border: none;
+}
+
+.nftDisplayBox p {
+  margin-left: 8.5%;
+  margin-right: 8.5%;
+  color: #f0f0f0;
+  letter-spacing: 2px;
+  font-size: 11px;
+}
+
+.nftDisplayBox h6 {
+  margin-left: 8.5%;
+  margin-right: 8.5%;
+  color: #f0f0f0;
+  letter-spacing: 2px;
+  font-size: 13px;
+}
+
+.content-p {
+  margin-top: 10px;
+  margin-bottom: 20px;
+  letter-spacing: 3px;
 }
