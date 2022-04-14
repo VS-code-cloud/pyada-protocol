@@ -72,6 +72,7 @@
   <div class='bodyContainer'>
     
     <h2 style='font-weight: 800; font-family: Verdana'>Your Pawned NFTs</h2><br/>
+    <div class='nftsWrapper' id='pawnedWrapper'>
       <p class='content-p'>You haven't pawned any NFTs yet!</p><br/><br/>
     <h2 style='font-weight: 800; font-family: Verdana'>Your NFTs</h2>
 
@@ -103,6 +104,24 @@
           ${nft.name}</h6>
           <p>${nft.description}</p>
           <button id="pawnModalBtn${nft.address}" onclick='(async() => {await pawnNFT("${nft.address}", 3, 30, ${nft.tokenid})})()'>Pawn This NFT</button>
+          <button style="margin-bottom: 20.5%;" onclick="window.open('${nft.polygonscan}')">View On Blockexplorer</button>
+        </div>
+      `
+      })
+    })();
+    (async () => {
+      address = await getAddress();
+      nfts = await getPawnedNFTs(address);
+      nfts.map((nft) => {
+
+        console.log(nft)
+      document.getElementById("pawnedWrapper").innerHTML = document.getElementById("pawnedWrapper").innerHTML + `
+        <div class='nftDisplayBox' id="${nft.address}">
+          <img src=${nft.image} class='nftImg' />
+          <h6>${(nft.symbol) ? `[${nft.symbol}]` : ""} 
+          ${nft.name}</h6>
+          <p>${nft.description}</p>
+          <button id="pawnModalBtn${nft.address}" onclick='(async() => {await pawnNFT("${nft.address}", 3, 30, ${nft.tokenid})})()'>Recover This NFT</button>
           <button style="margin-bottom: 20.5%;" onclick="window.open('${nft.polygonscan}')">View On Blockexplorer</button>
         </div>
       `

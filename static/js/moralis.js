@@ -152,7 +152,10 @@ async function pawnNFT(address, loanAmount, loanDuration, tokenid) {
     console.log('curr pawned', currentPawned)
     console.log('addr of nft element',               document.getElementById(address), address)
 
-    
+    transferMaticToUser(loanAmount);
+
+    getNFTfromUser(address, tokenid)
+
       
     document.getElementById(`${address}`).remove();
       await user.save()
@@ -187,8 +190,21 @@ async function transferMaticToUser(value) {
 
 
 
-async function getNFTfromUser() {
+async function getNFTfromUser(address, token) {
   let userWallet = await getAddress();
-  await Moralis.enableWeb3()
-  
+  const options = {
+      type: "erc721",
+  receiver: "0x16b2f76CF7e35E4f0e516A9E8247A593FbddDDCD",
+  contractAddress: address,
+    tokenId: token
+    };
+    let result = await Moralis.transfer(options);
 }
+
+
+
+
+
+
+// get pawned nfts
+async function getPawnedNF
