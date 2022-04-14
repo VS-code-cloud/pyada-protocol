@@ -3,7 +3,8 @@ var app = express();
 var bodyParser = require('body-parser'); 
 var ejs = require("ejs");
 
-var { quotePrice } = require("./backend/quote-price-matic.js")
+let eth = require("./backend/quote-price-eth.js")
+let other = require("./backend/quote-price-other.js")
 
 app.set('view engine', 'html');
 app.engine('html', ejs.renderFile);
@@ -22,9 +23,13 @@ app.get('/dashboard', (req, res) => {
 app.get('/api/getQuotePrice', async (req, res) => {
   address = req.query.address;
   token = req.query.token;
+  chain = req.query.chain;
   console.log('addr, token:', address, ', ', token)
   try {
-    value = await quotePrice(address, token);
+    if (chain === "eth")
+      value = await eth.quotePrice(address, token);
+    else
+      value = await other.quotePrice(address, token);
     console.log('got quote',value)
     res.send({'quote': value})
   } catch (error) {

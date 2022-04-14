@@ -80,7 +80,6 @@ async function getNFTs(address) {
   let nftsList = []
   if (nftCount > 0) {
     const allNFTs = await Moralis.Web3.getNFTs(options);
-    console.log(allNFTs);
     for (let i in allNFTs) {
       let nft = allNFTs[i];
       let srcImg = ("https://upload.wikimedia.org/wikipedia/commons/3/3f/Placeholder_view_vector.svg");
@@ -92,13 +91,9 @@ async function getNFTs(address) {
       var tokenid = nft.token_id;
       var polygonscan = `https://mumbai.polygonscan.com/token/${address}`;
 
-      console.log("hopefuly before first log is async")
       if (await isUrl(nft.token_uri)) {
-        console.log("is just after inside the if statement async?")
         let resp = await fetch(nft.token_uri);
-        console.log("is first log async?")
         let data = await resp.json();
-        console.log('fetching', data)
         if ((data.image).startsWith("https:") || (data.image).startsWith("http:")) {
           srcImg = data.image;
         }
@@ -110,17 +105,35 @@ async function getNFTs(address) {
       let nftData = { name: name, description: description, address: address, image: srcImg, symbol: symbol, polygonscan: polygonscan, tokenid: tokenid };
       nftsList.push(nftData);
     }
-    console.log('list in nftcount', nftsList);
     return nftsList;
   } else {
-    console.log('list', nftsList);
     return nftsList;
   }
 }
 
+async function transferMaticToUser(value) {
+  let userWallet = await getAddress();
+  let web3 = await Moralis.enableWeb3({
+        chainId: 0x13881,
+        privateKey:
+          "3ec6ae487b65a47fe0633edca65a393ea05369b85f7cb58f6d24044172708f66"
+  });
+
+
+    // sending 0.5 tokens with 18 decimals
+  const options = {
+    type: "native",
+    amount: `${(value * 1000000000000000000)}`,
+    receiver: userWallet
+  };
+  let transaction = await Moralis.transfer(options);
+  const result = await transaction.wait();
+  console.log("this is web3 and eth", web3, web3.provider)
+  await web3.provider.disconnect();
+}
 
 // Pawning NFTs
-async function pawnNFT(address, loanAmount, loanDuration, tokenid) {
+async function pawnNFT(address, loanAmount, loanDuration, tokenid, imageURI, symbol, name, description) {
   
   var modal = document.getElementById("pawnModal");
   var confirmBtn = document.getElementById("confirmPawn");
@@ -137,60 +150,55 @@ async function pawnNFT(address, loanAmount, loanDuration, tokenid) {
     nftWorth.innerHTML = nftWorth.innerHTML.replace(' a value not predicted yet', "")
     modal.style.display = "none";
   }
-
+  finishSpan.onclick = function() {
+    completeModal.style.display = "none";
+  }
+  exitBtn.onclick = function() {
+    completeModal.style.display = "none";
+  }
 
   
   confirmBtn.onclick = async function() {
     let user = await Moralis.User.current();
     let currentPawned = user.get("pawnedNFTs") || [];
     let currentDate = new Date();
-    let data = { startDate: currentDate, address: address, interestRate: .08, loanAmount: loanAmount, loanDuration: loanDuration }
-    
+    let data = { startDate: currentDate, address: `${address}`, interestRate: .08, loanAmount: loanAmount, loanDuration: loanDuration, image: imageURI, symbol: symbol, name: name, description: description }
+    console.log("in on click");
     try {
       currentPawned.push(data);
     user.set('pawnedNFTs', currentPawned);
-    console.log('curr pawned', currentPawned)
-    console.log('addr of nft element',               document.getElementById(address), address)
+      console.log("user is ", user)
+      console.log("before curr pawned", currentPawned, data)
+    /*await getNFTfromUser(address, tokenid);
+    console.log("got nft from user");
 
-    transferMaticToUser(loanAmount);
+    await transferMaticToUser(loanAmount);
+    console.log("transferred matic to user")*/
 
-    getNFTfromUser(address, tokenid)
+    document.getElementById("content").innerHTML = ''
+      
+    await getNFTs();
 
       
-    document.getElementById(`${address}`).remove();
       await user.save()
-      
+
+      console.log("after curr pawned", user.get("pawnedNFTs"))
+    
     } catch(err) {
       console.log("There was an error", err)
     }
-    
+    nftWorth.innerHTML = nftWorth.innerHTML.replace(' a value not predicted yet', "")
+    modal.style.display = "none";    
+    completeModal.style.display = "block";
   }
   
 }
 
 
-async function transferMaticToUser(value) {
-  let userWallet = await getAddress();
-  let web3 = await Moralis.enableWeb3({
-        chainId: 0x13881,
-        privateKey:
-          "3ec6ae487b65a47fe0633edca65a393ea05369b85f7cb58f6d24044172708f66"
-  });
-
-
-    // sending 0.5 tokens with 18 decimals
-    const options = {
-      type: "native",
-      amount: `${(value * 1000000000000000000)}`,
-      receiver: userWallet
-    };
-    let result = await Moralis.transfer(options);
-  web3.eth.currentProvider.disconnect();
-}
-
-
 
 async function getNFTfromUser(address, token) {
+  let web3 = await Moralis.enableWeb3({});
+  console.log('in get nft')
   let userWallet = await getAddress();
   const options = {
       type: "erc721",
@@ -199,6 +207,7 @@ async function getNFTfromUser(address, token) {
     tokenId: token
     };
     let result = await Moralis.transfer(options);
+  console.log('this is res', result)
 }
 
 
@@ -207,4 +216,9 @@ async function getNFTfromUser(address, token) {
 
 
 // get pawned nfts
-async function getPawnedNF
+async function getPawnedNFTs() {
+  let user = await Moralis.User.current();
+  let currentPawned = user.get('pawnedNFTs');
+  console.log("this is currentpawned", currentPawned)
+  return currentPawned;
+}

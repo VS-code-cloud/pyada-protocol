@@ -10,19 +10,16 @@
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@100;300;400;500;700;900&display=swap" rel="stylesheet">
 
     <title>Pyada Protocol | Dashboard | The NFT Pawn Shop</title>
-    <!--link rel="icon" type="image/x-icon" href="https://i.ibb.co/PYt4N9B/Pyada-Logo.png"-->
+    <link rel="icon" type="image/x-icon" href="https://i.ibb.co/PYt4N9B/Pyada-Logo.png"
     <link rel='icon' href='/static/images/pyadaIcon.png'>
-    <!-- Bootstrap core CSS -->
     <link href="vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
     
-    <!-- Additional CSS Files -->
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.1/css/all.css" integrity="sha384-50oBUHEmvpQ+1lW4y57PTFmhCaXp0ML5d60M1M7uH2+nqUivzIebhndOJK28anvf" crossorigin="anonymous">
     <link rel="stylesheet" href="/static/css/main.css">
     <link rel="stylesheet" href="/static/css/dashboard.css">
     <link rel="stylesheet" href="/static/css/owl.css">
   </head>
-  <body>
-<script src="https://cdn.jsdelivr.net/npm/web3@latest/dist/web3.min.js"></script>
+<!--  <body>
     <script src="https://unpkg.com/moralis/dist/moralis.js"></script>
     <script src='/static/js/moralis.js'></script>
     <script>
@@ -67,20 +64,31 @@
       </div>
     </div>
   </header>
-  <!-- ***** Header Area End ***** -->
-  <!-- ***** Main Body ***** -->
 
   <div class='bodyContainer'>
     
     <h2 style='font-weight: 800; font-family: Verdana'>Your Pawned NFTs</h2><br/>
     <div class='nftsWrapper' id='pawnedWrapper'></div>
-    <br/><h2 style='font-weight: 800; font-family: Verdana'>Your NFTs</h2>
+<br/><br/><br/>
+    <h2 style='font-weight: 800; font-family: Verdana'>Your NFTs</h2>
 
   <script>
     (async () => {
-      let address = await getAddress();
-      console.log("this is the address", address)
-    })();
+       let pawnedNfts = await getPawnedNFTs();
+       pawnedNfts.map((nft) => {
+
+       document.getElementById("pawnedWrapper").innerHTML = document.getElementById("pawnedWrapper").innerHTML + `
+         <div class='nftDisplayBox' id="${nft.address}">
+           <img src=${nft.image} class='nftImg' />
+           <h6>${(nft.symbol) ? `[${nft.symbol}]` : ""} 
+           ${nft.name}</h6>
+           <p>${nft.description}</p>
+           <button id="recoverModalBtn${nft.address}" onclick='(async() => {await pawnNFT("${nft.address}", 0.2, 30, ${nft.tokenid}, ${nft.image}, ${nft.symbol}, ${nft.name}, ${nft.description})})()'>Recover This NFT</button>
+           <button style="margin-bottom: 20.5%;" onclick="window.open('${nft.polygonscan}')">View On Blockexplorer</button>
+         </div>`
+       
+       })
+     })();
   </script>
 
     
@@ -96,37 +104,20 @@
       nfts = await getNFTs(address);
       nfts.map((nft) => {
 
-        console.log(nft)
       document.getElementById("nftsWrapper").innerHTML = document.getElementById("nftsWrapper").innerHTML + `
-        <div class='nftDisplayBox' id="${nft.address}">
-          <img src=${nft.image} class='nftImg' />
-          <h6>${(nft.symbol) ? `[${nft.symbol}]` : ""} 
-          ${nft.name}</h6> 
-          <p>${nft.description}</p>
-          <button id="pawnModalBtn${nft.address}" onclick='(async() => {await pawnNFT("${nft.address}", 0.2, 30, "${nft.tokenid}", "${nft.image}", "${nft.symbol}", "${nft.name}", "${nft.description}")})()'>Pawn This NFT</button>
-          <button style="margin-bottom: 20.5%;" onclick="window.open('${nft.polygonscan}')">View On Blockexplorer</button>
-        </div>
-      `
-      })
-    })();
-    (async () => {
-      address = await getAddress();
-      nfts = await getPawnedNFTs(address);
-      nfts.map((nft) => {
-
-        console.log(nft)
-      document.getElementById("pawnedWrapper").innerHTML = document.getElementById("pawnedWrapper").innerHTML + `
         <div class='nftDisplayBox' id="${nft.address}">
           <img src=${nft.image} class='nftImg' />
           <h6>${(nft.symbol) ? `[${nft.symbol}]` : ""} 
           ${nft.name}</h6>
           <p>${nft.description}</p>
-          <button id="pawnModalBtn${nft.address}" onclick='(async() => {await pawnNFT("${nft.address}", 0.2, 30, "${nft.tokenid}", "${nft.image}", "${nft.symbol}", "${nft.name}", "${nft.description}")})()'>Recover This NFT</button>
+          <button id="pawnModalBtn${nft.address}" onclick='(async() => {await pawnNFT("${nft.address}", 0.2, 30, ${nft.tokenid}, ${nft.image}, ${nft.symbol}, ${nft.name}, ${nft.description})})()'>Pawn This NFT</button>
           <button style="margin-bottom: 20.5%;" onclick="window.open('${nft.polygonscan}')">View On Blockexplorer</button>
         </div>
       `
       })
     })();
+  </script>
+  <script>
   </script>
   </div>
   
@@ -138,7 +129,7 @@
       <button class="invisBtn" id='confirmPawn'><div class="gradient-button"><a>I am sure</a></div></button>
     </div>
   </div>
-    <div id="pawnComplete" class="pawn-complete">
+    <iv id="pawnComplete" class="pawn-complete">
       <div class="pawn-modal-content" style="text-align:center">
         <span id='close-pawn-complete' class="close-pawn-modal">&times;</span>
         <span class="header_title">Your NFT Has Now Been Pawned! </span><br/><br/>
@@ -173,4 +164,4 @@
   <script src="static/js/popup.js"></script>
   <script src="static/js/custom.js"></script>
   </body>
-</html>
+</html>-->
