@@ -10,9 +10,9 @@ exports.quotePrice = async (chain, address, token) => {
   token = 1
   
   let obj = {};
-  let op =  { chain, address, limit:10 }
+  let op =  { chain, address }
   let txns = await Moralis.Web3API.token.getNFTTrades(op);
-  console.log("txns",txns, txns.result[0].token_ids)
+  console.log("txns",txns)
   let prices = txns.result.map(i => i.price);
   var lastPrice = prices.length ? prices[0] : 0;
   if (!lastPrice) {
