@@ -18,14 +18,11 @@ function auth() {
 
 // Log Out
 async function logOut() {
-  let logout = document.getElementById("logoutMetamask")
-  logout.onclick = async function() {
-    console.log('user being logged out')
-    await Moralis.User.logOut();
-    window.location.replace("/");
-  }
+  Moralis.User.logOut().then(async () => {
+    const currentUser = await Moralis.User.current();
+    window.location.replace("/")
+  });
 }
-
 
 // Check if logged in
 async function mainPageLoad() {
@@ -129,6 +126,8 @@ async function transferMaticToUser(value) {
     receiver: userWallet
   };
   let transaction = await Moralis.transfer(options);
+  const result = await transaction.wait();
+  // await web3.provider.disconnect();
 }
 
 // Pawning NFTs
@@ -149,7 +148,6 @@ async function pawnNFT(address, loanAmount, loanRate, loanDuration, tokenid, ima
 
   
   confirmBtn.onclick = async function() {
-    modal.style.display = "none";
     let user = await Moralis.User.current();
     let currentPawned = user.get("pawnedNFTs") || [];
     let currentDate = new Date();
@@ -161,8 +159,10 @@ async function pawnNFT(address, loanAmount, loanRate, loanDuration, tokenid, ima
       console.log("user is ", user)
       console.log("before curr pawned", currentPawned, data)
     
-    await transferMaticToUser(loanAmount);
+      
     await getNFTfromUser(address, tokenid);
+
+    await transferMaticToUser(loanAmount);
 
     document.getElementById("content").innerHTML = ''
       
@@ -170,10 +170,10 @@ async function pawnNFT(address, loanAmount, loanRate, loanDuration, tokenid, ima
 
       
     await user.save()
-    window.location.reload();
     } catch(err) {
       console.log("There was an error", err)
     }
+    window.location.reload();
 
   }
   
@@ -182,28 +182,21 @@ async function pawnNFT(address, loanAmount, loanRate, loanDuration, tokenid, ima
 
 
 async function getNFTfromUser(address, token) {
-  /*await getAddress();
-  await Moralis.enableWeb3();
+  let web3 = await Moralis.enableWeb3({});
+
+  console.log('in get nft')
+  let userWallet = await getAddress();
+  console.log('this wallet', userWallet)
   const options = {
       type: "erc721",
   receiver: "0x16b2f76CF7e35E4f0e516A9E8247A593FbddDDCD",
   contractAddress: address,
     tokenId: token
     };
-  await Moralis.transfer(options);
-  console.log('this is web3 provider', web3.provider)*/
-  token = parseInt(token) ? parseInt(token) : token;
-let web3 = await Moralis.enableWeb3({});
-  console.log('in get nft')
-  let userWallet = await getAddress();
-  const options = {
-    type: "erc721",
-    receiver: "0x16b2f76CF7e35E4f0e516A9E8247A593FbddDDCD",
-    contractAddress: address,
-    tokenId: token,
-  };
-  let transaction = await Moralis.transfer(options);
-  console.log('this is res', transaction)
+  console.log("this is options", options)
+let result = await Moralis.transfer(options);
+  console.log('this is web3 provider', web3.provider)
+  // await web3.provider.disconnect()
 }
 
 
@@ -221,12 +214,13 @@ async function giveNFTtoUser(address, token) {
   contractAddress: address,
     tokenId: token
     };
-  await Moralis.transfer(options);
+  let result = await Moralis.transfer(options);
+    // await web3.provider.disconnect();
 }
 
 async function getMaticFromUser(value) {
-  await getAddress();
-  await Moralis.enableWeb3();
+  let userWallet = await getAddress();
+  let web3 = await Moralis.enableWeb3({});
 
     // sending 0.5 tokens with 18 decimals
   const options = {
@@ -235,6 +229,9 @@ async function getMaticFromUser(value) {
     receiver: "0x16b2f76CF7e35E4f0e516A9E8247A593FbddDDCD"
   };
   let transaction = await Moralis.transfer(options);
+  const result = await transaction.wait();
+  console.log("this is web3 and eth", web3, web3.provider)
+  // await web3.provider.disconnect();
 }
 
 
@@ -259,27 +256,31 @@ async function reclaimNFT(address) {
   TO TEXT INSTEAD OF "NOT PREDICTED YET"*/
   var now = new Date();
   var startDate = new Date(NFT.startDate);
+  console.log('nftochiye', NFT)
   var dayDiff = Math.round((now.getTime() - startDate.getTime())/(1000 * 3600 * 24));
+  console.log('now, startdate, daydiff', now, startDate, dayDiff)
 // To calculate the no. of days between two dates
   var price = NFT.loanAmount*Math.pow((1+(NFT.interestRate/30)), dayDiff);
   nftPrice.innerHTML = nftPrice.innerHTML + price + "."
   modal.style.display = "block";
   span.onclick = function() {
-    nftPrice.innerHTML = nftPrice.innerHTML.replace(`${price}.`, "")
+    nftWorth.innerHTML = nftWorth.innerHTML.replace(`${price}.`, "")
     modal.style.display = "none";
   }
 
   
   confirmBtn.onclick = async function() {
     try {
-      currentPawned = currentPawned.filter(item => item.address == address && item.token==NFT.token)
+      currentPawned = currentPawned.filter(item => item.address !== address && item.token!==NFT.token)
+      currentPawned.push(currentPawned);
     user.set('pawnedNFTs', currentPawned);
       console.log("user is ", user)
       console.log("before curr reclaimed", currentPawned)
     
-    await getMaticFromUser(NFT.loanAmount);
-    await giveNFTtoUser(address, NFT.token);
+      
+    await giveNFTtoUser(address, NFT.tokenid);
 
+    await getMaticFromUser(NFT.loanAmount);
 
     document.getElementById("content").innerHTML = ''
       
@@ -287,10 +288,10 @@ async function reclaimNFT(address) {
 
       
     await user.save()
-    window.location.reload();
     } catch(err) {
       console.log("There was an error", err)
     }
+    window.location.reload();
 
   }
   

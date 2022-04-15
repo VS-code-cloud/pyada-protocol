@@ -29,10 +29,11 @@
   <body>
   
   <script src="https://unpkg.com/moralis/dist/moralis.js"></script>
+    <script src='https://cdn.jsdelivr.net/npm/hardhat@2.6.4/'></script>
   <script src='/static/js/moralis.js'></script>
   <script>
-      document.body.onload = () => {
-        mainPageLoad();
+      document.body.onload = async () => {
+        await mainPageLoad();
       }
   </script>
   <!-- ***** Preloader Start ***** -->
@@ -274,7 +275,7 @@
     <div class="container">
         <div class="col-lg-12">
           <div class="copyright-text">
-            <p>Copyright © 2022 Vibhuv Sharma, Vishnu Sharma, & Samriddhi Sharma. All Rights Reserved.</p>
+            <p>Copyright © 2022 Vishnu Sharma, Vibhuv Sharma, & Samriddhi Sharma. All Rights Reserved.</p>
           </div>
         </div>
       </div>

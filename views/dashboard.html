@@ -25,9 +25,10 @@
 <script src="https://cdn.jsdelivr.net/npm/web3@latest/dist/web3.min.js"></script>
     <script src="https://unpkg.com/moralis/dist/moralis.js"></script>
     <script src='/static/js/moralis.js'></script>
+    <script src='/static/js/moralisContract.js'></script>
     <script>
-      document.body.onload = () => {
-        dashboardLoad();
+      document.body.onload = async () => {
+        await dashboardLoad();
       }
     </script>
 
@@ -56,7 +57,7 @@
             <!-- ***** Logo End ***** -->
             <!-- ***** Menu Start ***** -->
             <ul class="nav">
-              <li><div id='logout' class="gradient-button"><a>LOG OUT</a></div></li> 
+              <li><button class="invisBtn"><div id='logoutMetamask' class="gradient-button"><a>LOG OUT</a></div></button></li> 
             </ul>        
             <a class='menu-trigger'>
                 <span>Menu</span>
@@ -67,6 +68,11 @@
       </div>
     </div>
   </header>
+    <script>
+
+      (async() => {await logOut()})()
+      
+    </script>
   <!-- ***** Header Area End ***** -->
   <!-- ***** Main Body ***** -->
 
@@ -79,7 +85,6 @@
   <script>
     (async () => {
       let address = await getAddress();
-      console.log("this is the address", address)
     })();
   </script>
 
@@ -96,14 +101,13 @@
       nfts = await getNFTs(address);
       nfts.map((nft) => {
 
-        console.log(nft)
       document.getElementById("nftsWrapper").innerHTML = document.getElementById("nftsWrapper").innerHTML + `
         <div class='nftDisplayBox' id="${nft.address}">
           <img src=${nft.image} class='nftImg' />
           <h6>${(nft.symbol) ? `[${nft.symbol}]` : ""} 
           ${nft.name}</h6> 
           <p>${nft.description}</p>
-          <button id="pawnModalBtn${nft.address}" onclick='(async() => {await pawnNFT("${nft.address}", 0.2, 30, "${nft.tokenid}", "${nft.image}", "${nft.symbol}", "${nft.name}", "${nft.description}")})()'>Pawn This NFT</button>
+          <button id="pawnModalBtn${nft.address}" onclick='(async() => {await pawnNFT("${nft.address}", 0.2, 0.08, 30, "${nft.tokenid}", "${nft.image}", "${nft.symbol}", "${nft.name}", "${nft.description}")})()'>Pawn This NFT</button>
           <button style="margin-bottom: 20.5%;" onclick="window.open('${nft.polygonscan}')">View On Blockexplorer</button>
         </div>
       `
@@ -114,14 +118,13 @@
       nfts = await getPawnedNFTs(address);
       nfts.map((nft) => {
 
-        console.log(nft)
       document.getElementById("pawnedWrapper").innerHTML = document.getElementById("pawnedWrapper").innerHTML + `
         <div class='nftDisplayBox' id="${nft.address}">
           <img src=${nft.image} class='nftImg' />
           <h6>${(nft.symbol) ? `[${nft.symbol}]` : ""} 
           ${nft.name}</h6>
           <p>${nft.description}</p>
-          <button id="pawnModalBtn${nft.address}" onclick='(async() => {await pawnNFT("${nft.address}", 0.2, 30, "${nft.tokenid}", "${nft.image}", "${nft.symbol}", "${nft.name}", "${nft.description}")})()'>Recover This NFT</button>
+          <button id="pawnModalBtn${nft.address}" onclick='(async() => {await reclaimNFT("${nft.address}", 0.2, 0.08, 30, "${nft.tokenid}", "${nft.image}", "${nft.symbol}", "${nft.name}", "${nft.description}")})()'>Recover This NFT</button>
           <button style="margin-bottom: 20.5%;" onclick="window.open('${nft.polygonscan}')">View On Blockexplorer</button>
         </div>
       `
@@ -129,7 +132,7 @@
     })();
   </script>
   </div>
-  
+  <!-- Pawn -->
   <div id="pawnModal" class="pawn-modal">
     <div class="pawn-modal-content" style="text-align:center">
       <span id="close-pawn-modal" class="close-pawn-modal">&times;</span>
@@ -138,12 +141,14 @@
       <button class="invisBtn" id='confirmPawn'><div class="gradient-button"><a>I am sure</a></div></button>
     </div>
   </div>
-    <div id="pawnComplete" class="pawn-complete">
-      <div class="pawn-modal-content" style="text-align:center">
-        <span id='close-pawn-complete' class="close-pawn-modal">&times;</span>
-        <span class="header_title">Your NFT Has Now Been Pawned! </span><br/><br/>
-        <button class="invisBtn" id='confirmPawn'><div id='exitFinishedPawn' class="gradient-button"><a>Great!</a></div></button>
-      </div>
+  <!-- Reclaim -->
+  <div id="reclaimModal" class="pawn-modal">
+    <div class="pawn-modal-content" style="text-align:center">
+      <span id="close-reclaim-modal" class="close-pawn-modal">&times;</span>
+      <span class="header_title">Do You Want to Reclaim Your NFT And Repay Your Loan? </span><br/><br/>
+      <p id="NFT-price" style="color:black">This NFT will be reclaimed for </p><br/><br/>
+      <button class="invisBtn" id='confirmReclaim'><div class="gradient-button"><a>Yes</a></div></button>
+    </div>
   </div>
   <!-- ***** Main Body End ***** -->
   
@@ -159,7 +164,7 @@
     <div class="container">
         <div class="col-lg-12">
           <div class="copyright-text">
-            <p>Copyright © 2022 Vibhuv Sharma, Vishnu Sharma, & Samriddhi Sharma. All Rights Reserved.</p>
+            <p>Copyright © 2022 Vishnu Sharma, Vibhuv Sharma, & Samriddhi Sharma. All Rights Reserved.</p>
           </div>
         </div>
       </div>

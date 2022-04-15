@@ -15,8 +15,6 @@ const instance = axios.create({
 // address: 0x2953399124f0cbb46d2cbacd8a89cf0599974963
 
 exports.quotePrice = async (address, token) => {
-  address = '0x88b48f654c30e99bc2e4a1559b4dcf1ad93fa656'
-  token = 47456413539839413962558409503758081421912155543913471056141328316292625596417
   console.log("in quote")
   if (!address || !token) {
     //return false
@@ -27,7 +25,7 @@ exports.quotePrice = async (address, token) => {
     let resp = await instance.get('/api/v1/asset/'+address+'/'+token);
     data = resp.data;
   } catch (error) {
-    console.log(error);
+    console.log('This is error', error);
     throw error.reason;
     
   }

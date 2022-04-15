@@ -18,14 +18,11 @@ function auth() {
 
 // Log Out
 async function logOut() {
-  let logout = document.getElementById("logoutMetamask")
-  logout.onclick = async function() {
-    console.log('user being logged out')
-    await Moralis.User.logOut();
-    window.location.replace("/");
-  }
+  Moralis.User.logOut().then(async () => {
+    const currentUser = await Moralis.User.current();
+    window.location.replace("/")
+  });
 }
-
 
 // Check if logged in
 async function mainPageLoad() {
