@@ -48,7 +48,9 @@ let options = {
   "Params": {
     "_nftAddress": address,
     "_nftTokenID":tokenid,
-    "_amountInWei": (amount*1000000000000000000)
+    "_amountInWei": (amount*1000000000000000000),
+    "_duration": duration,
+    "_interestRate": interestrate
   }
 }
 
