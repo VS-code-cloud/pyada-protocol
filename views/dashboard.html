@@ -116,7 +116,7 @@
     (async () => {
       address = await getAddress();
       nfts = await getPawnedNFTs(address);
-      nfts.map((nft) => {
+      nfts?.map((nft) => {
 
       document.getElementById("pawnedWrapper").innerHTML = document.getElementById("pawnedWrapper").innerHTML + `
         <div class='nftDisplayBox' id="${nft.address}">
@@ -148,6 +148,13 @@
       <span class="header_title">Do You Want to Reclaim Your NFT And Repay Your Loan? </span><br/><br/>
       <p id="NFT-price" style="color:black">This NFT will be reclaimed for </p><br/><br/>
       <button class="invisBtn" id='confirmReclaim'><div class="gradient-button"><a>Yes</a></div></button>
+    </div>
+  </div>
+  <!-- Loading -->
+  <div id="loadModal" class="pawn-modal">
+    <div class="pawn-modal-content" style="text-align:center">
+      <span id="close-pawn-modal" class="close-pawn-modal">&times;</span>
+      <span class="header_title"><h2>Loading...</h2></span><br/><br/>
     </div>
   </div>
   <!-- ***** Main Body End ***** -->
