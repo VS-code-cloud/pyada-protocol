@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@100;300;400;500;700;900&display=swap" rel="stylesheet">
+
+    <title>Pyada Protocol | Dashboard | The NFT Pawn Shop</title>
+    <!--link rel="icon" type="image/x-icon" href="https://i.ibb.co/PYt4N9B/Pyada-Logo.png"-->
+    <link rel='icon' href='/static/images/pyadaIcon.png'>
+    <!-- Bootstrap core CSS -->
+    <link href="vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Additional CSS Files -->
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.1/css/all.css" integrity="sha384-50oBUHEmvpQ+1lW4y57PTFmhCaXp0ML5d60M1M7uH2+nqUivzIebhndOJK28anvf" crossorigin="anonymous">
+    <link rel="stylesheet" href="/static/css/main.css">
+    <link rel="stylesheet" href="/static/css/dashboard.css">
+    <link rel="stylesheet" href="/static/css/owl.css">
+  </head>
+  <body>
+<script src="https://cdn.jsdelivr.net/npm/web3@latest/dist/web3.min.js"></script>
+    <script src="https://unpkg.com/moralis/dist/moralis.js"></script>
+    <script src='/static/js/moralis.js'></script>
+    <script src='https://cdn.jsdelivr.net/npm/hardhat@2.6.4/'></script>
+    <script>
+      document.body.onload = async () => {
+        await dashboardLoad();
+      }
+    </script>
+
+    <!-- ***** Preloader Start ***** -->
+  <div id="js-preloader" class="js-preloader">
+    <div class="preloader-inner">
+      <span class="dot"></span>
+      <div class="dots">
+        <span></span>
+        <span></span>
+        <span></span>
+      </div>
+    </div>
+  </div>
+  <!-- ***** Preloader End ***** -->
+  <!-- ***** Header Area Start ***** -->
+  <header class="header-area header-sticky wow slideInDown sticky-top" data-wow-duration="0.75s" data-wow-delay="0s">
+    <div class="container">
+      <div class="row">
+        <div class="col-12">
+          <nav class="main-nav">
+            <!-- ***** Logo Start ***** -->
+            <a href="/dashboard" class="logo">
+              <img src="static/images/pyada-logo.png" alt="Pyada Protocol Logo">
+            </a>
+            <!-- ***** Logo End ***** -->
+            <!-- ***** Menu Start ***** -->
+            <ul class="nav">
+              <li><div id='logoutMetamask' class="gradient-button"><a>LOG OUT</a></div></li> 
+            </ul>        
+            <a class='menu-trigger'>
+                <span>Menu</span>
+            </a>
+            <!-- ***** Menu End ***** -->
+          </nav>
+        </div>
+      </div>
+    </div>
+  </header>
+  <!-- ***** Header Area End ***** -->
+  <!-- ***** Main Body ***** -->
+
+  <div class='bodyContainer'>
+    
+    <h2 style='font-weight: 800; font-family: Verdana'>Your Pawned NFTs</h2><br/>
+    <div class='nftsWrapper' id='pawnedWrapper'></div>
+    <br/><h2 style='font-weight: 800; font-family: Verdana'>Your NFTs</h2>
+
+  <script>
+    (async () => {
+      let address = await getAddress();
+    })();
+  </script>
+
+    
+  <div id='content'>
+    <div class='nftsWrapper' id='nftsWrapper'>
+      
+    </div>
+  </div>
+
+  <script>
+    (async () => {
+      address = await getAddress();
+      nfts = await getNFTs(address);
+      nfts.map((nft) => {
+
+      document.getElementById("nftsWrapper").innerHTML = document.getElementById("nftsWrapper").innerHTML + `
+        <div class='nftDisplayBox' id="${nft.address}">
+          <img src=${nft.image} class='nftImg' />
+          <h6>${(nft.symbol) ? `[${nft.symbol}]` : ""} 
+          ${nft.name}</h6> 
+          <p>${nft.description}</p>
+          <button id="pawnModalBtn${nft.address}" onclick='(async() => {await pawnNFT("${nft.address}", 0.2, 0.08, 30, "${nft.tokenid}", "${nft.image}", "${nft.symbol}", "${nft.name}", "${nft.description}")})()'>Pawn This NFT</button>
+          <button style="margin-bottom: 20.5%;" onclick="window.open('${nft.polygonscan}')">View On Blockexplorer</button>
+        </div>
+      `
+      })
+    })();
+    (async () => {
+      address = await getAddress();
+      nfts = await getPawnedNFTs(address);
+      nfts.map((nft) => {
+
+      document.getElementById("pawnedWrapper").innerHTML = document.getElementById("pawnedWrapper").innerHTML + `
+        <div class='nftDisplayBox' id="${nft.address}">
+          <img src=${nft.image} class='nftImg' />
+          <h6>${(nft.symbol) ? `[${nft.symbol}]` : ""} 
+          ${nft.name}</h6>
+          <p>${nft.description}</p>
+          <button id="pawnModalBtn${nft.address}" onclick='(async() => {await reclaimNFT("${nft.address}", 0.2, 0.08, 30, "${nft.tokenid}", "${nft.image}", "${nft.symbol}", "${nft.name}", "${nft.description}")})()'>Recover This NFT</button>
+          <button style="margin-bottom: 20.5%;" onclick="window.open('${nft.polygonscan}')">View On Blockexplorer</button>
+        </div>
+      `
+      })
+    })();
+  </script>
+  </div>
+  <!-- Pawn -->
+  <div id="pawnModal" class="pawn-modal">
+    <div class="pawn-modal-content" style="text-align:center">
+      <span id="close-pawn-modal" class="close-pawn-modal">&times;</span>
+      <span class="header_title">Are You Sure You Want to Pawn This NFT? </span><br/><br/>
+      <p id="NFT-worth" style="color:black">This NFT will be pawned for </p><p style="color:black"> at a rate of 8% a month compounded daily.</p><br/><br/>
+      <button class="invisBtn" id='confirmPawn'><div class="gradient-button"><a>I am sure</a></div></button>
+    </div>
+  </div>
+  <!-- Reclaim -->
+  <div id="reclaimModal" class="pawn-modal">
+    <div class="pawn-modal-content" style="text-align:center">
+      <span id="close-reclaim-modal" class="close-pawn-modal">&times;</span>
+      <span class="header_title">Do You Want to Reclaim Your NFT And Repay Your Loan? </span><br/><br/>
+      <p id="NFT-price" style="color:black">This NFT will be reclaimed for </p><br/><br/>
+      <button class="invisBtn" id='confirmReclaim'><div class="gradient-button"><a>Yes</a></div></button>
+    </div>
+  </div>
+  <!-- ***** Main Body End ***** -->
+  
+    <!-- Scripts -->
+  <script src="vendor/jquery/jquery.min.js"></script>
+  <script src="vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+  <script src="static/js/owl-carousel.js"></script>
+  <script src="static/js/animation.js"></script>
+  <!--script src="static/js/imagesloaded.js"></script-->
+  <script src="static/js/popup.js"></script>
+  <script src="static/js/custom.js"></script>
+    <footer id="newsletter">
+    <div class="container">
+        <div class="col-lg-12">
+          <div class="copyright-text">
+            <p>Copyright © 2022 Vishnu Sharma, Vibhuv Sharma, & Samriddhi Sharma. All Rights Reserved.</p>
+          </div>
+        </div>
+      </div>
+    </footer>
+  <!-- Scripts -->
+  <script src="vendor/jquery/jquery.min.js"></script>
+  <script src="vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+  <script src="static/js/owl-carousel.js"></script>
+  <script src="static/js/animation.js"></script>
+  <!--script src="static/js/imagesloaded.js"></script-->
+  <script src="static/js/popup.js"></script>
+  <script src="static/js/custom.js"></script>
+  </body>
+</html>
