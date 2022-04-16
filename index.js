@@ -17,7 +17,9 @@ app.get('/', (req, res) => {
 })
 
 app.get('/dashboard', (req, res) => {
-  res.render("dashboard.html", {})
+  res.render("dashboard.html", 
+    {privateKey: process.env['privateKey']
+  })
 })
 
 app.get('/api/getQuotePrice', async (req, res) => {

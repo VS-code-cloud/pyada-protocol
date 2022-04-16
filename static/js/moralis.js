@@ -4,7 +4,6 @@
 const serverUrl = "https://gox0zhxekxir.usemoralis.com:2053/server";
 const appId = "1Wc4e9uFtXxdvJj3HvnN7irm6hrYAwei0znBZUka";
 Moralis.start({ serverUrl, appId });
-
 // Log In
 function auth() {
   Moralis.authenticate({ signingMessage: "Authenticate to gain access to the Pyada Protocol." }).then(() => {
@@ -20,7 +19,6 @@ function auth() {
 async function logOut() {
   let logout = document.getElementById("logoutMetamask")
   logout.onclick = async function() {
-    console.log('user being logged out')
     await Moralis.User.logOut();
     window.location.replace("/");
   }
@@ -32,8 +30,6 @@ async function mainPageLoad() {
   const currentUser = await Moralis.User.current();
   if (currentUser) {
     window.location.replace("/dashboard")
-  } else {
-    console.log("Not logged in")
   }
 
 }
@@ -41,9 +37,7 @@ async function mainPageLoad() {
 // Dashboard
 async function dashboardLoad() {
   const currentUser = await Moralis.User.current();
-  if (currentUser) {
-    console.log("current user", currentUser)
-  } else {
+  if (!currentUser) {
     window.location.replace('/');
   }
 }
@@ -114,11 +108,11 @@ async function getNFTs(address) {
 }
 
 async function transferMaticToUser(value) {
-  const privateKey = process.env['privateKey']
   let userWallet = await getAddress();
   let web3 = await Moralis.enableWeb3({
         chainId: 0x13881,
-        privateKey: privateKey
+        privateKey:
+          "3ec6ae487b65a47fe0633edca65a393ea05369b85f7cb58f6d24044172708f66"
   });
 
 
@@ -144,10 +138,8 @@ async function pawnNFT(address, loanAmount, loanRate, loanDuration, tokenid, ima
   // TODO ONCE PRICE PREDICTOR IS COMPLETE: ADD PRICE PREDICTOR
   //TO TEXT INSTEAD OF "NOT PREDICTED YET"
   let resp = await fetch(`https://pyadaprotocol.randomcodingboy.repl.co/api/getQuotePrice?address=${address}&token=${tokenid}&chain=8001`);
-  console.log("resp",resp);
   var quoteDict = await resp.json();
   quoteDict = quoteDict ? quoteDict :  {"quote":0.000001}
-  console.log('this is quoteDict', quoteDict)
   var loanAmount = quoteDict.quote;
   nftWorth.innerHTML = nftWorth.innerHTML + " " + loanAmount
   modal.style.display = "block";
@@ -165,22 +157,20 @@ async function pawnNFT(address, loanAmount, loanRate, loanDuration, tokenid, ima
     let currentDate = new Date();
     tokenid = parseInt(tokenid) ? parseInt(tokenid) : tokenid;
     var data = { startDate: currentDate, address: `${address}`, interestRate: loanRate, loanAmount: loanAmount, loanDuration: loanDuration, image: imageURI, symbol: symbol, name: name, description: description, token: tokenid }
-    console.log("in on click", data);
     try {
       modal.style.display = "none";
       await Moralis.enableWeb3();
       transferN = await getNFTfromUser(address, tokenid);
       transferM = await transferMaticToUser(loanAmount);
-      console.log('this is transferm and trasnfern', transferM, transferN);
-      console.log("this is currentpawned before push", currentPawned, data)
       currentPawned.push(data);
       user.set('pawnedNFTs', currentPawned);
-      console.log('this is currentpawned after', currentPawned)
       await user.save();
       document.getElementById("content").innerHTML = ''
       window.location.reload();
     } catch(err) {
       console.log("There was an error", err, 'n', transferN, 'm', transferM)
+      window.location.reload();
+
     }
   }
   
@@ -188,19 +178,8 @@ async function pawnNFT(address, loanAmount, loanRate, loanDuration, tokenid, ima
 
 
 async function getNFTfromUser(address, token) {
-  /*await getAddress();
-  await Moralis.enableWeb3();
-  const options = {
-      type: "erc721",
-  receiver: "0x16b2f76CF7e35E4f0e516A9E8247A593FbddDDCD",
-  contractAddress: address,
-    tokenId: token
-    };
-  await Moralis.transfer(options);
-  console.log('this is web3 provider', web3.provider)*/
   token = parseInt(token) ? parseInt(token) : token;
   let web3 = await Moralis.enableWeb3();
-  console.log('in get nft')
   let userWallet = await getAddress();
   const options = {
     type: "erc721",
@@ -215,23 +194,20 @@ async function getNFTfromUser(address, token) {
 
 
 async function giveNFTtoUser(address, token) {
-  const privateKey = process.env['privateKey']
   let userWallet = await getAddress();
   let web3 = await Moralis.enableWeb3({
         chainId: 0x13881, 
-        privateKey: privateKey
+        privateKey:
+          "3ec6ae487b65a47fe0633edca65a393ea05369b85f7cb58f6d24044172708f66"
   });
   token = parseInt(token) ? parseInt(token) : token;
-  console.log('inputs', address, token, userWallet, web3)
-  console.log('in get nft', token)
-  var options = {
+  const options = {
   type: "erc721",
   receiver: userWallet,
   contractAddress: address,
-  tokenId: token
+  tokenId: token,
 };
-  let transaction = await Moralis.transfer(options);
-  console.log('txn',transaction)
+let transaction = await Moralis.transfer(options);
   let result = await transaction.wait();
   return result;
 }
@@ -248,7 +224,6 @@ async function getMaticFromUser(value) {
   };
   let transaction = await Moralis.transfer(options);
   let result = await transaction.wait();
-  console.log("got matric",result);
   return result;
 }
 
@@ -272,7 +247,6 @@ async function reclaimNFT(address) {
   var currentPawned = user.get("pawnedNFTs") || [];
   var NFT = null;
   NFT = currentPawned.filter(item => item.address == address)[0]
-  console.log("this is nft", NFT, address)
   var now = new Date();
   var startDate = new Date(NFT.startDate);
   var dayDiff = Math.round((now.getTime() - startDate.getTime())/(1000 * 3600 * 24));
@@ -291,14 +265,11 @@ async function reclaimNFT(address) {
     try {
       modal.style.display = "none";
       loadModal.style.display = "block";
-      console.log("before curr reclaimed", currentPawned)
-    console.log('nft and addr', NFT, address)
     transferM = await getMaticFromUser(NFT.loanAmount);
     transferN = await giveNFTtoUser(address, NFT.token);
       
     let data = currentPawned.filter(item => item.address !== address && item.token!==NFT.token)
     user.set('pawnedNFTs', data);
-      console.log("user is ", user)
 
     document.getElementById("content").innerHTML = ''
       
@@ -309,6 +280,7 @@ async function reclaimNFT(address) {
     window.location.reload();
     } catch(err) {
       console.log("There was an error", err, 'm', transferM, 'n', transferN)
+      window.location.reload();
     }
 
   }
