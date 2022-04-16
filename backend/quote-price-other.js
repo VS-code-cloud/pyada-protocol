@@ -6,6 +6,6 @@ Moralis.start({ serverUrl, appId });
 
 exports.quotePrice = async (chain, address, token) => {
   
-  return 0.000001;
+  return 0.05;
 
 }
