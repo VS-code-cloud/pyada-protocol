@@ -26,7 +26,6 @@ app.get('/api/getQuotePrice', async (req, res) => {
   address = req.query.address;
   token = req.query.token;
   chain = req.query.chain ? req.query.chain : "eth";
-  console.log('addr, token:', address, ', ', token)
   try {
     if (chain === "eth")
       value = await eth.quotePrice(address, token);

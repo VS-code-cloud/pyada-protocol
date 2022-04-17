@@ -1,10 +1,49 @@
-'use strict'
+'use strict';
 
 /* Moralis init code */
 const serverUrl = "https://gox0zhxekxir.usemoralis.com:2053/server";
 const appId = "1Wc4e9uFtXxdvJj3HvnN7irm6hrYAwei0znBZUka";
 Moralis.start({ serverUrl, appId });
 // Log In
+let contractAddress = '0x51A1ceB83B83F1985a81C295d1fF28Afef186E02'
+const ERC721TransferABI = [
+  {
+    inputs: [
+      { internalType: 'address', name: 'from', type: 'address' },
+      { internalType: 'address', name: 'to', type: 'address' },
+      { internalType: 'uint256', name: 'tokenId', type: 'uint256' },
+    ],
+    outputs: [
+      {
+        name: '',
+        type: 'bool',
+      },
+    ],
+    name: 'safeTransferFrom',
+    type: 'function',
+    constant: false,
+    payable: false,
+  },
+  {
+    inputs: [
+      { internalType: 'address', name: 'from', type: 'address' },
+      { internalType: 'address', name: 'to', type: 'address' },
+      { internalType: 'uint256', name: 'tokenId', type: 'uint256' },
+    ],
+    outputs: [
+      {
+        name: '',
+        type: 'bool',
+      },
+    ],
+    name: 'transferFrom',
+    type: 'function',
+    constant: false,
+    payable: false,
+  },
+];
+
+
 function auth() {
   Moralis.authenticate({ signingMessage: "Authenticate to gain access to the Pyada Protocol." }).then(() => {
     document.getElementById("login").style.display = 'none';
@@ -165,7 +204,7 @@ async function pawnNFT(address, loanAmount, loanRate, loanDuration, tokenid, ima
       currentPawned.push(data);
       user.set('pawnedNFTs', currentPawned);
       await user.save();
-      document.getElementById("content").innerHTML = ''
+      //document.getElementById("content").innerHTML = ''
       window.location.reload();
     } catch(err) {
       console.log("There was an error", err, 'n', transferN, 'm', transferM)
@@ -195,21 +234,34 @@ async function getNFTfromUser(address, token) {
 
 async function giveNFTtoUser(address, token) {
   let userWallet = await getAddress();
+  //let web3 = await Moralis.enableWeb3(); 
   let web3 = await Moralis.enableWeb3({
         chainId: 0x13881, 
         privateKey:
           "3ec6ae487b65a47fe0633edca65a393ea05369b85f7cb58f6d24044172708f66"
   });
-  token = parseInt(token) ? parseInt(token) : token;
-  const options = {
-  type: "erc721",
-  receiver: userWallet,
-  contractAddress: address,
-  tokenId: token,
-};
-let transaction = await Moralis.transfer(options);
-  let result = await transaction.wait();
+  /*const options = {
+    type: "erc721",
+    receiver: userWallet,
+    contractAddress: address,
+    tokenId: token,
+  };*/
+  const ethers = Moralis.web3Library;
+  let provider = new ethers.providers.JsonRpcProvider("https://rpc-mumbai.maticvigil.com/v1/202cf93e75046c12f10f2d8310787279e6cc2110")
+
+  const pawnShop = web3.getSigner();
+  let pawnWallet = new ethers.Wallet("3ec6ae487b65a47fe0633edca65a393ea05369b85f7cb58f6d24044172708f66");
+  var connectedPawnWallet = pawnWallet.connect(provider);
+  const sender = "0x16b2f76CF7e35E4f0e516A9E8247A593FbddDDCD";
+ // let customToken = new ethers.Contract(address, ERC721TransferABI, signer);
+//  let result = await customToken.safeTransferFrom(sender, userWallet, token, {from:sender});
+
+    let NFT = new ethers.Contract(address, ERC721TransferABI, pawnShop);
+  let result = await NFT.connect(connectedPawnWallet).transferFrom(sender, userWallet, token);
+  //let transaction = await Moralis.transfer(options);
+  //let result = await transaction.wait();
   return result;
+
 }
 
 async function getMaticFromUser(value) {
@@ -217,9 +269,10 @@ async function getMaticFromUser(value) {
   await Moralis.enableWeb3();
 
     // sending 0.5 tokens with 18 decimals
+  let price = Math.round(Number(value * 1000000000000000000));
   const options = {
     type: "native",
-    amount: `${(value * 1000000000000000000)}`,
+    amount: `${price}`,
     receiver: "0x16b2f76CF7e35E4f0e516A9E8247A593FbddDDCD"
   };
   let transaction = await Moralis.transfer(options);
@@ -237,7 +290,6 @@ async function getPawnedNFTs() {
 
 // reclaim stuff
 async function reclaimNFT(address) {
-  
   var modal = document.getElementById("reclaimModal");
   var confirmBtn = document.getElementById("confirmReclaim");
   var span = document.getElementById("close-reclaim-modal");
@@ -265,7 +317,8 @@ async function reclaimNFT(address) {
     try {
       modal.style.display = "none";
       loadModal.style.display = "block";
-    transferM = await getMaticFromUser(NFT.loanAmount);
+      let numPrice = Number(price);
+    transferM = await getMaticFromUser(numPrice);
     transferN = await giveNFTtoUser(address, NFT.token);
       
     let data = currentPawned.filter(item => item.address !== address && item.token!==NFT.token)
@@ -279,7 +332,7 @@ async function reclaimNFT(address) {
     await user.save();
     window.location.reload();
     } catch(err) {
-      console.log("There was an error", err, 'm', transferM, 'n', transferN)
+      console.log("There was an error", JSON.stringify(err), 'm', transferM, 'n', transferN)
       window.location.reload();
     }
 
